@@ -3,6 +3,8 @@
 function Popup(contents, options) {
   EventEmitter.call(this);
 
+  this._state = Popup.STATE_INITIAL;
+
   this._opts = {};
   for (var i = 0, len = Popup.OPTION_KEYS.length; i < len; ++i) {
     var key = Popup.OPTION_KEYS[i];
@@ -37,6 +39,8 @@ function Popup(contents, options) {
   if (this._opts.draggable && this._opts.draggableHeight > 0) {
     this._configureDragging();
   }
+
+  this._animation = null;
 }
 
 Popup.DEFAULTS = {
@@ -55,17 +59,60 @@ Popup.DEFAULTS = {
 
 Popup.OPTION_KEYS = Object.keys(Popup.DEFAULTS);
 
+Popup.STATE_INITIAL = 0;
+Popup.STATE_SHOWN = 1;
+Popup.STATE_CLOSED = 2;
+
 Popup._bodyScrollingPopupCount = 0;
 Popup._PRIVATE_CLOSE_EVENT = '_close';
 
 Popup.prototype = Object.create(EventEmitter.prototype);
 
 Popup.prototype.show = function() {
-  // TODO: add the popup to the DOM and play an opening animation.
+  if (this._state !== Popup.STATE_INITIAL) {
+    return;
+  }
+  this._state = Popup.STATE_SHOWN;
+
+  if (this._opts.affectBodyScroll) {
+    if (0 === Popup._bodyScrollingPopupCount++) {
+      this.once('show', function() {
+        document.body.style.overflow = 'auto';
+      });
+    }
+  }
+
+  if (this._opts.animation === null) {
+    document.body.appendChild(this._shielding);
+    document.body.appendChild(this._popup);
+    this.emit('show');
+  } else {
+    this._animation = new this._opts.animation(this._popup, this._shielding);
+    this._animation.on('show', this.emit.bind(this, 'show'));
+    this._animation.on('destroy', this.emit.bind(this, 'destroy'));
+    this._animation.start();
+  }
 };
 
 Popup.prototype.close = function() {
-  // TODO: play a closing animation or destroy the popup.
+  if (this._state !== Popup.STATE_SHOWN) {
+    return;
+  }
+  this._state = Popup.STATE_CLOSED;
+
+  if (this._opts.affectBodyScroll) {
+    if (0 === --Popup._bodyScrollingPopupCount) {
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  if (this._opts.animation === null) {
+    document.body.removeChild(this._shielding);
+    document.body.removeChild(this._popup);
+    this.emit('destroy');
+  } else {
+    this._animation.reverse();
+  }
 };
 
 Popup.prototype._layout = function() {
