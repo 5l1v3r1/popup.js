@@ -10,11 +10,11 @@ For building, you will need [jsbuild](https://github.com/unixpickle/jsbuild) and
 
 # Building
 
-If you wish to build the source code, you can run `sh build.sh`. You must have bash and jsbuild installed to run this. For more, see [Dependencies](#Dependencies).
+If you wish to build the source code, you can run `sh build.sh`. You must have bash and jsbuild installed to run this. For more, see [Dependencies](#dependencies).
 
 # Usage
 
-First, you must build and import the compiled source code. After following the [build instructions](#Building), the relevant file will be located at `build/popup.js`. You can import it like this:
+First, you must build and import the compiled source code. After following the [build instructions](#building), the relevant file will be located at `build/popup.js`. You can import it like this:
 
   <script src="popup.js" type="text/javascript"></script>
 
@@ -35,7 +35,7 @@ You may provide the following options to the constructor:
  * *string* shieldColor - the color of the shield, if there is one. This is a CSS value, so you can use a hex color code, a color name, or something like `rgba(x,y,z,w)`.
  * *number* startX - the initial X offset of the center of the popup, in relative coordinates (i.e. between 0 and 1).
  * *number* startY - the initial Y offset of the center of the popup, in relative coordinates (i.e. between 0 and 1).
- * [Animation](#The-Animation-type) - the animation to use for showing and hiding the popup. If you do not specify an animation, a default one will be used. If you specify a `null` animation, no animation will be used.
+ * [Animation](#the-animation-type) - the animation to use for showing and hiding the popup. If you do not specify an animation, a default one will be used. If you specify a `null` animation, no animation will be used.
 
 The `Popup` class is an event emitter and will emit the following events:
 
