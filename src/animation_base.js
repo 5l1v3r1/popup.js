@@ -48,6 +48,8 @@ EasingAnimation.prototype.start = function() {
   this._waitingFrame = true;
   this._startTime = new Date().getTime();
   this._tick();
+  document.body.appendChild(this.getShielding());
+  document.body.appendChild(this.getPopup());
 };
 
 EasingAnimation.prototype.reverse = function() {

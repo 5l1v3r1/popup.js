@@ -1,4 +1,4 @@
-//deps event_emitter.js
+//deps fall_fade_animation.js
 
 function Popup(contents, options) {
   EventEmitter.call(this);
@@ -49,7 +49,8 @@ Popup.DEFAULTS = {
   shield: true,
   shieldColor: 'rgba(0, 0, 0, 0.4)',
   startX: 0.5,
-  startY: 0.45
+  startY: 0.45,
+  animation: FallFadeAnimation
 };
 
 Popup.OPTION_KEYS = Object.keys(Popup.DEFAULTS);
