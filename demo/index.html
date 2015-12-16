@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html style="width: 100%; height: 100%">
   <head>
     <meta charset="utf-8" />
     <title>popup.js Demo</title>
@@ -10,13 +10,15 @@
         element.style.backgroundColor = 'white';
         var p = new window.popupjs.Popup(element, {
           width: 500,
-          height: Math.round(500/1.618)
+          height: Math.round(500/1.618),
+          draggable: true,
+          draggableHeight: 50
         });
         p.show();
       }
     </script>
   </head>
-  <body>
+  <body style="min-width: 100%; min-height: 100%">
     <button onclick="showPopup()">Blank Popup</button>
   </body>
 </html>

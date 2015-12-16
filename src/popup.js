@@ -144,11 +144,11 @@ Popup.prototype._layout = function() {
 
   // NOTE: if the window is too small, the popup should never go over the left
   // side but it may go over the right side.
-  if (left+this._width > windowWidth) {
-    left = windowWidth - this._width;
+  if (left+this._opts.width > windowWidth) {
+    left = windowWidth - this._opts.width;
   }
-  if (top+this._height > windowHeight) {
-    top = windowHeight - this._height;
+  if (top+this._opts.height > windowHeight) {
+    top = windowHeight - this._opts.height;
   }
 
   left = Math.max(Math.round(left), 0);
@@ -167,32 +167,32 @@ Popup.prototype._configureDragging = function() {
 
 Popup.prototype._handleMouseDown = function(e) {
   var clientRect = this._element.getBoundingClientRect();
-  if (e.clientX-clientRect.top > this._opts.draggableHeight) {
+  if (e.clientY-clientRect.top > this._opts.draggableHeight) {
     return;
   }
 
   var moveHandler = function(moveEvent) {
-    var offsetX = moveEvent.clientX - initialMousePosition.left;
-    var offsetY = moveEvent.clientY - initialMousePosition.top;
+    var offsetX = moveEvent.clientX - e.clientX;
+    var offsetY = moveEvent.clientY - e.clientY;
     var newPopupCenterX = offsetX + clientRect.left + this._opts.width/2;
     var newPopupCenterY = offsetY + clientRect.top + this._opts.height/2;
     var relX = newPopupCenterX / window.innerWidth;
     var relY = newPopupCenterY / window.innerHeight;
-    this._x = Math.max(Math.min(x, 1), 0);
-    this._y = Math.max(Math.min(y, 1), 0);
+    this._x = Math.max(Math.min(relX, 1), 0);
+    this._y = Math.max(Math.min(relY, 1), 0);
     this._layout();
   }.bind(this);
 
   var endHandler;
   endHandler = function() {
     this.removeListener(Popup._PRIVATE_CLOSE_EVENT, endHandler);
-    document.body.removeEventListener('mouseup', endHandler);
-    document.body.removeEventListener('mousemove', moveHandler);
+    window.removeEventListener('mouseup', endHandler);
+    window.removeEventListener('mousemove', moveHandler);
   }.bind(this);
 
   this.once(Popup._PRIVATE_CLOSE_EVENT, endHandler);
-  document.body.addEventListener('mouseup', endHandler);
-  document.body.addEventListener('mousemove', moveHandler);
+  window.addEventListener('mouseup', endHandler);
+  window.addEventListener('mousemove', moveHandler);
 };
 
 exports.Popup = Popup;
