@@ -32,6 +32,8 @@ function Popup(contents, options) {
 
     // NOTE: this fixes some lag in Chrome and Safari.
     this._shielding.style.webkitBackfaceVisibility = 'hidden';
+
+    this._shielding.addEventListener('click', this.close.bind(this));
   } else {
     this._shielding = null;
   }
