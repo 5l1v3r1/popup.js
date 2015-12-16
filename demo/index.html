@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>popup.js Demo</title>
+    <script src="../build/popup.js"></script>
+    <script type="text/javascript">
+      function showPopup() {
+        var element = document.createElement('div');
+        element.style.backgroundColor = 'white';
+        var p = new window.popupjs.Popup(element, {
+          width: 300,
+          height: Math.round(300/1.618)
+        });
+        p.show();
+      }
+    </script>
+  </head>
+  <body>
+    <button onclick="showPopup()">Blank Popup</button>
+  </body>
+</html>

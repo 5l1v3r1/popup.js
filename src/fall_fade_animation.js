@@ -6,6 +6,8 @@ function FallFadeAnimation(popup, shielding) {
 
 FallFadeAnimation.FALL_PIXELS = 50;
 
+FallFadeAnimation.prototype = Object.create(EasingAnimation.prototype);
+
 FallFadeAnimation.prototype.showFrame = function(fraction) {
   var transform;
   if (fraction === 1) {
@@ -14,7 +16,9 @@ FallFadeAnimation.prototype.showFrame = function(fraction) {
     var translation = ((fraction - 1) * FallFadeAnimation.FALL_PIXELS).toFixed(2);
     transform = 'translateY(' + translation + 'px)';
   }
-  this.getShielding().style.opacity = fraction.toFixed(3);
+  if (this.getShielding() !== null) {
+    this.getShielding().style.opacity = fraction.toFixed(3);
+  }
   this.getPopup().style.opacity = fraction.toFixed(3);
   this.getPopup().style.transform = transform;
   this.getPopup().style.webkitTransform = transform;

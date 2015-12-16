@@ -7,7 +7,7 @@ function BaseAnimation(popup, shielding) {
   this._shielding = shielding;
 }
 
-BaseAnimation.prototype = Object.create(BaseAnimation.prototype);
+BaseAnimation.prototype = Object.create(EventEmitter.prototype);
 
 BaseAnimation.prototype.getPopup = function() {
   return this._popup;
@@ -33,6 +33,8 @@ function EasingAnimation(popup, shielding) {
   this._reversed = false;
 }
 
+EasingAnimation.prototype = Object.create(BaseAnimation.prototype);
+
 EasingAnimation.prototype.getDuration = function() {
   return 0.4;
 };
@@ -48,7 +50,9 @@ EasingAnimation.prototype.start = function() {
   this._waitingFrame = true;
   this._startTime = new Date().getTime();
   this._tick();
-  document.body.appendChild(this.getShielding());
+  if (this.getShielding() !== null) {
+    document.body.appendChild(this.getShielding());
+  }
   document.body.appendChild(this.getPopup());
 };
 
@@ -81,7 +85,9 @@ EasingAnimation.prototype._tick = function() {
     this._waitingFrame = false;
     if (this._reversed) {
       document.body.removeChild(this.getPopup());
-      document.body.removeChild(this.getShielding());
+      if (this.getShielding() !== null) {
+        document.body.removeChild(this.getShielding());
+      }
       this.emit('destroy');
     } else {
       this.showFrame(1);

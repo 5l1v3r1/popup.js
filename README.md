@@ -48,7 +48,7 @@ The `Popup` class is an event emitter and will emit the following events:
 It is possible to use custom animations for showing and hiding popups. All you have to do is subclass `BaseAnimation`. You must override the following methods:
 
  * constructor(popup, shielding) - you must, in the very least, call the super constructor.
- * *void* start() - called to begin the animation. This will only be called once. In this method, you must add the popup and its shielding to the DOM. You can access them using `this.getPopup()` and `this.getShielding()`, respectively.
+ * *void* start() - called to begin the animation. This will only be called once. In this method, you must add the popup and its shielding to the DOM. You can access them using `this.getPopup()` and `this.getShielding()`, respectively. Note that the shielding may be `null`.
  * *void* reverse() - called to reverse the animation. This will only be called once, and is guaranteed to be called after `start()`.
 
 In addition, `BaseAnimation` is an event emitter. You must emit the following events:
@@ -66,13 +66,17 @@ function MyAnimation(popup, shielding) {
 MyAnimation.prototype = Object.create(window.popupjs.BaseAnimation.prototype);
 
 MyAnimation.prototype.show = function() {
-  document.body.appendChild(this.getShielding());
+  if (this.getShielding() !== null) {
+    document.body.appendChild(this.getShielding());
+  }
   document.body.appendChild(this.getPopup());
   this.emit('show');
 };
 
 MyAnimation.prototype.reverse = function() {
-  document.body.removeChild(this.getShielding());
+  if (this.getShielding() !== null) {
+    document.body.removeChild(this.getShielding());
+  }
   document.body.removeChild(this.getPopup());
   this.emit('destroy');
 };

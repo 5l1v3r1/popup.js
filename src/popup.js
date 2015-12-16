@@ -21,19 +21,19 @@ function Popup(contents, options) {
   this._element.style.position = this._opts.position;
 
   if (this._opts.shield) {
-    this._shield = document.createElement('div');
-    this._shield.className = 'popupjs-shielding';
-    this._shield.style.backgroundColor = this._opts.shieldColor;
-    this._shield.style.position = 'fixed';
-    this._shield.style.left = '0';
-    this._shield.style.top = '0';
-    this._shield.style.width = '100%';
-    this._shield.style.height = '100%';
+    this._shielding = document.createElement('div');
+    this._shielding.className = 'popupjs-shielding';
+    this._shielding.style.backgroundColor = this._opts.shieldColor;
+    this._shielding.style.position = 'fixed';
+    this._shielding.style.left = '0';
+    this._shielding.style.top = '0';
+    this._shielding.style.width = '100%';
+    this._shielding.style.height = '100%';
 
     // NOTE: this fixes some lag in Chrome and Safari.
-    this._shield.style.webkitBackfaceVisibility = 'hidden';
+    this._shielding.style.webkitBackfaceVisibility = 'hidden';
   } else {
-    this._shield = null;
+    this._shielding = null;
   }
 
   this._x = this._opts.startX;
@@ -92,7 +92,9 @@ Popup.prototype.show = function() {
   this.once('destroy', window.removeEventListener.bind(window, 'resize', boundLayout));
 
   if (this._opts.animation === null) {
-    document.body.appendChild(this._shielding);
+    if (this._shielding !== null) {
+      document.body.appendChild(this._shielding);
+    }
     document.body.appendChild(this._element);
     this.emit('show');
   } else {
@@ -118,7 +120,9 @@ Popup.prototype.close = function() {
   }
 
   if (this._opts.animation === null) {
-    document.body.removeChild(this._shielding);
+    if (this._shielding !== null) {
+      document.body.removeChild(this._shielding);
+    }
     document.body.removeChild(this._element);
     this.emit('destroy');
   } else {
@@ -133,8 +137,8 @@ Popup.prototype._layout = function() {
   var windowWidth = window.innerWidth;
   var windowHeight = window.innerHeight;
 
-  var x = windowWidth*this._x - this._opts.width/2;
-  var y = windowHeight*this._y - this._opts.height/2;
+  var left = windowWidth*this._x - this._opts.width/2;
+  var top = windowHeight*this._y - this._opts.height/2;
 
   // NOTE: if the window is too small, the popup should never go over the left
   // side but it may go over the right side.
@@ -148,8 +152,8 @@ Popup.prototype._layout = function() {
   left = Math.max(Math.round(left), 0);
   top = Math.max(Math.round(top), 0);
 
-  this._element.style.left = left;
-  this._element.style.top = top;
+  this._element.style.left = Math.round(left) + 'px';
+  this._element.style.top = Math.round(top) + 'px';
 };
 
 Popup.prototype._configureDragging = function() {
@@ -188,3 +192,5 @@ Popup.prototype._handleMouseDown = function(e) {
   document.body.addEventListener('mouseup', endHandler);
   document.body.addEventListener('mousemove', moveHandler);
 };
+
+exports.Popup = Popup;
