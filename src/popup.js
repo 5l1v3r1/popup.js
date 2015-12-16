@@ -29,6 +29,9 @@ function Popup(contents, options) {
     this._shield.style.top = '0';
     this._shield.style.width = '100%';
     this._shield.style.height = '100%';
+
+    // NOTE: this fixes some lag in Chrome and Safari.
+    this._shield.style.webkitBackfaceVisibility = 'hidden';
   } else {
     this._shield = null;
   }
@@ -51,7 +54,7 @@ Popup.DEFAULTS = {
   position: 'fixed',
   affectBodyScroll: false,
   shield: true,
-  shieldColor: 'rgba(0, 0, 0, 0.4)',
+  shieldColor: 'rgba(0, 0, 0, 0.5)',
   startX: 0.5,
   startY: 0.45,
   animation: FallFadeAnimation
@@ -82,14 +85,20 @@ Popup.prototype.show = function() {
     }
   }
 
+  this._layout();
+
+  var boundLayout = this._layout.bind(this);
+  window.addEventListener('resize', boundLayout);
+  this.once('destroy', window.removeEventListener.bind(window, 'resize', boundLayout));
+
   if (this._opts.animation === null) {
     document.body.appendChild(this._shielding);
-    document.body.appendChild(this._popup);
+    document.body.appendChild(this._element);
     this.emit('show');
   } else {
-    this._animation = new this._opts.animation(this._popup, this._shielding);
-    this._animation.on('show', this.emit.bind(this, 'show'));
-    this._animation.on('destroy', this.emit.bind(this, 'destroy'));
+    this._animation = new this._opts.animation(this._element, this._shielding);
+    this._animation.once('show', this.emit.bind(this, 'show'));
+    this._animation.once('destroy', this.emit.bind(this, 'destroy'));
     this._animation.start();
   }
 };
@@ -100,6 +109,8 @@ Popup.prototype.close = function() {
   }
   this._state = Popup.STATE_CLOSED;
 
+  this.emit(Popup._PRIVATE_CLOSE_EVENT);
+
   if (this._opts.affectBodyScroll) {
     if (0 === --Popup._bodyScrollingPopupCount) {
       document.body.style.overflow = 'hidden';
@@ -108,15 +119,37 @@ Popup.prototype.close = function() {
 
   if (this._opts.animation === null) {
     document.body.removeChild(this._shielding);
-    document.body.removeChild(this._popup);
+    document.body.removeChild(this._element);
     this.emit('destroy');
   } else {
+    this._animation.once('destroy', function() {
+      window.removeEventListener('resize', this._resizeListener);
+    }.bind(this));
     this._animation.reverse();
   }
 };
 
 Popup.prototype._layout = function() {
-  // TODO: position the element correctly.
+  var windowWidth = window.innerWidth;
+  var windowHeight = window.innerHeight;
+
+  var x = windowWidth*this._x - this._opts.width/2;
+  var y = windowHeight*this._y - this._opts.height/2;
+
+  // NOTE: if the window is too small, the popup should never go over the left
+  // side but it may go over the right side.
+  if (left+this._width > windowWidth) {
+    left = windowWidth - this._width;
+  }
+  if (top+this._height > windowHeight) {
+    top = windowHeight - this._height;
+  }
+
+  left = Math.max(Math.round(left), 0);
+  top = Math.max(Math.round(top), 0);
+
+  this._element.style.left = left;
+  this._element.style.top = top;
 };
 
 Popup.prototype._configureDragging = function() {
@@ -151,7 +184,7 @@ Popup.prototype._handleMouseDown = function(e) {
     document.body.removeEventListener('mousemove', moveHandler);
   }.bind(this);
 
-  this.on(Popup._PRIVATE_CLOSE_EVENT, endHandler);
+  this.once(Popup._PRIVATE_CLOSE_EVENT, endHandler);
   document.body.addEventListener('mouseup', endHandler);
   document.body.addEventListener('mousemove', moveHandler);
 };
