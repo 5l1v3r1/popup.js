@@ -171,6 +171,9 @@ Popup.prototype._handleMouseDown = function(e) {
     return;
   }
 
+  // NOTE: this prevents the cursor from turning into an ibeam on drag.
+  e.preventDefault();
+
   var moveHandler = function(moveEvent) {
     var offsetX = moveEvent.clientX - e.clientX;
     var offsetY = moveEvent.clientY - e.clientY;
