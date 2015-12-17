@@ -1,5 +1,7 @@
 //deps fall_fade_animation.js
 
+var ESCAPE_KEY = 27;
+
 function Popup(contents, options) {
   EventEmitter.call(this);
 
@@ -33,7 +35,10 @@ function Popup(contents, options) {
     // NOTE: this fixes some lag in Chrome and Safari.
     this._shielding.style.webkitBackfaceVisibility = 'hidden';
 
-    this._shielding.addEventListener('click', this.close.bind(this));
+    this._shielding.addEventListener('click', function() {
+      this.close();
+      this.emit('close');
+    }.bind(this));
   } else {
     this._shielding = null;
   }
@@ -43,6 +48,9 @@ function Popup(contents, options) {
 
   if (this._opts.draggable && this._opts.draggableHeight > 0) {
     this._configureDragging();
+  }
+  if (this._opts.closeOnEscape) {
+    this._configureKeyboard();
   }
 
   this._animation = null;
@@ -59,7 +67,8 @@ Popup.DEFAULTS = {
   shieldColor: 'rgba(0, 0, 0, 0.5)',
   startX: 0.5,
   startY: 0.45,
-  animation: FallFadeAnimation
+  animation: FallFadeAnimation,
+  closeOnEscape: true
 };
 
 Popup.OPTION_KEYS = Object.keys(Popup.DEFAULTS);
@@ -135,6 +144,15 @@ Popup.prototype.close = function() {
   }
 };
 
+// keypress handles events from the keyboard.
+Popup.prototype.keypress = function(e) {
+  if (e.which === ESCAPE_KEY) {
+    this.close();
+    this.emit('close');
+  }
+  return false;
+};
+
 Popup.prototype._layout = function() {
   var windowWidth = window.innerWidth;
   var windowHeight = window.innerHeight;
@@ -196,6 +214,16 @@ Popup.prototype._handleMouseDown = function(e) {
   this.once(Popup._PRIVATE_CLOSE_EVENT, endHandler);
   window.addEventListener('mouseup', endHandler);
   window.addEventListener('mousemove', moveHandler);
+};
+
+Popup.prototype._configureKeyboard = function() {
+  var handler = this.keypress.bind(this);
+  this.once('show', function() {
+    window.addEventListener('keypress', handler);
+    this.once(Popup._PRIVATE_CLOSE_EVENT, function() {
+      window.removeEventListener('keypress', handler);
+    }.bind(this));
+  }.bind(this));
 };
 
 exports.Popup = Popup;

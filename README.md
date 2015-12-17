@@ -36,12 +36,19 @@ You may provide the following options to the constructor:
  * *number* startX - the initial X offset of the center of the popup, in relative coordinates (i.e. between 0 and 1).
  * *number* startY - the initial Y offset of the center of the popup, in relative coordinates (i.e. between 0 and 1).
  * [Animation](#the-animation-type) animation - the animation to use for showing and hiding the popup. If you do not specify an animation, a default one will be used. If you specify a `null` animation, no animation will be used.
+ * bool closeOnEscape - true if the popup should automatically listen for keyboard events and close when the escape key is pressed. This is not ideal for nested popups, since the escape key would close every popup.
 
 The `Popup` class is an event emitter and will emit the following events:
 
  * close - emitted when the popup is closed by anything besides `close()`.
  * show - emitted after the presentation animation is complete, or in `show()` if no animation was used.
  * destroy - emitted after the destruction animation is complete, or immediately upon the popup being closed if no animation was used.
+
+The `Popup` class implements the following methods:
+
+ * void show() - present the popup. You should only call this once.
+ * void close() - close the popup. You should only call this (at most) once. If you do call this, it should be after a `show()`.
+ * void keypress(e) - tell the popup that a key has been pressed. The passed event must have a `which` property. If you set `closeOnEscape` to false, you can still use this to tell the popup about keyboard events. Calling this manually allows you to manage the event pipeline and deal with nested popups.
 
 # The Animation type
 
