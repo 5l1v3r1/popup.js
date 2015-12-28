@@ -3,7 +3,7 @@
 var ESCAPE_KEY = 27;
 
 function Popup(contents, options) {
-  EventEmitter.call(this);
+  window.EventEmitter.call(this);
 
   this._state = Popup.STATE_INITIAL;
 
@@ -80,7 +80,7 @@ Popup.STATE_CLOSED = 2;
 Popup._bodyScrollingPopupCount = 0;
 Popup._PRIVATE_CLOSE_EVENT = '_close';
 
-Popup.prototype = Object.create(EventEmitter.prototype);
+Popup.prototype = Object.create(window.EventEmitter.prototype);
 
 Popup.prototype.show = function() {
   if (this._state !== Popup.STATE_INITIAL) {

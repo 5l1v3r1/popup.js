@@ -1,13 +1,11 @@
-//deps event_emitter.js
-
 function BaseAnimation(popup, shielding) {
-  EventEmitter.call(this);
+  window.EventEmitter.call(this);
 
   this._popup = popup;
   this._shielding = shielding;
 }
 
-BaseAnimation.prototype = Object.create(EventEmitter.prototype);
+BaseAnimation.prototype = Object.create(window.EventEmitter.prototype);
 
 BaseAnimation.prototype.getPopup = function() {
   return this._popup;

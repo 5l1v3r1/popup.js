@@ -4,7 +4,7 @@ This is an API for displaying popups on the web. It supports animations and othe
 
 # Dependencies
 
-For normal operation, popup.js uses the `window.requestAnimationFrame()` API. If you do not use animations, then this is not required.
+For normal operation, popup.js uses the `window.requestAnimationFrame()` API. If you do not use animations, then this is not required. This depends on [eventemitter.js](https://github.com/unixpickle/eventemitter.js) as well.
 
 For building, you will need [jsbuild](https://github.com/unixpickle/jsbuild) and a shell like `sh`.
 
@@ -16,12 +16,16 @@ If you wish to build the source code, you can run `sh build.sh`. You must have b
 
 First, you must build and import the compiled source code. After following the [build instructions](#building), the relevant file will be located at `build/popup.js`. You can import it like this:
 
-  <script src="popup.js" type="text/javascript"></script>
+```html
+<script src="popup.js" type="text/javascript"></script>
+```
 
 The `Popup` class is the most basic way to present a popup. A `Popup` takes an element and presents it as a popup, modifying its CSS attributes in the process:
 
-  var p = new window.popupjs.Popup(element, options);
-  p.show();
+```js
+var p = new window.popupjs.Popup(element, options);
+p.show();
+```
 
 You may provide the following options to the constructor:
 
@@ -95,3 +99,7 @@ MyAnimation.prototype.reverse = function() {
  * *void* showFrame(amountVisible) - set style attributes on the popup and shielding (which will automatically be added/removed from the DOM) for the `amountVisible` argument. `amountVisible` will be 0 when the popup is fully hidden, and 1 when it is fully visible.
 
 The API comes with one `EasingAnimation` implementation, namely `FallFadeAnimation`. It "drops" and "fades" the popup in a pretty way.
+
+# TODO
+
+ * Let the escape key close the popup before the popup is fully visible.
